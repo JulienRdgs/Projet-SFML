@@ -1,51 +1,126 @@
+
 #include <SFML/Graphics.hpp>
+#include <SFML/Window.hpp>
+#include <SFML/System.hpp>
 #include <iostream>
+#include <vector>
 
+
+// Dimensions de la fenêtre
+const int WINDOW_WIDTH = 800;
+const int WINDOW_HEIGHT = 600;
+
+// Dimensions des raquettes
+const float PADDLE_WIDTH = 10.f;
+const float PADDLE_HEIGHT = 100.f;
+
+// Rayon de la balle
+const float BALL_RADIUS = 10.f;
+
+// Vitesse de la balle
+sf::Vector2f ballVelocity(3.0f, 3.0f);
+
+const float POS_LIGNE = WINDOW_WIDTH * 0.15;
+
+bool styloB = false;
+bool pinceauB = false;
+
+void activeButton(sf::RectangleShape button, sf::Mouse mouse, sf::RenderWindow& window, bool& selec) {
+    if (button.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window))) && selec == false) {
+        std::cout << "dessiner" << std::endl;
+        selec = true;
+    }
+    else if (button.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window))) && selec == true) {
+        std::cout << "ne plus dessiner" << std::endl;
+        selec = false;
+    }
+}
 int main() {
-    int choix = 0;
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Déplacer une Forme");
 
-    // Création d'un cercle
-    sf::CircleShape circle(50.f); // Rayon de 50 pixels
-    circle.setFillColor(sf::Color::Blue);
-    circle.setPosition(100.f, 300.f); // Position initiale
+    sf::Image image;
+    image.create(WINDOW_WIDTH, WINDOW_HEIGHT, sf::Color::White);
+    sf::Texture textImage;
+    textImage.loadFromImage(image);
+    sf::Sprite spriteImage;
+    spriteImage.setTexture(textImage);
 
-    sf::CircleShape circle2(50.f); // Rayon de 50 pixels
-    circle2.setFillColor(sf::Color::Green);
-    circle2.setPosition(0.f, 0.f); // Position initiale
+    std::vector<sf::CircleShape> dessin;
+
+    sf::Font font;
+    if (!font.loadFromFile("arial.ttf")) { std::cout << "erreur" << std::endl; }
+
+    // Créer la fenêtre
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Paint SFML JRdgs");
+    window.setFramerateLimit(60);
+
+    sf::RectangleShape stylo(sf::Vector2f(50, 50));
+    stylo.setPosition(0, 0);
+    stylo.setFillColor(sf::Color::Red);
+
+    sf::RectangleShape pinceau(sf::Vector2f(50, 50));
+    pinceau.setPosition(100, 0);
+    pinceau.setFillColor(sf::Color::Green);
+
+    sf::VertexArray ligne(sf::Lines);
+    ligne.append(sf::Vertex(sf::Vector2f(0, POS_LIGNE), sf::Color::Black));
+    ligne.append(sf::Vertex(sf::Vector2f(WINDOW_WIDTH, POS_LIGNE), sf::Color::Black));
+
 
     while (window.isOpen()) {
 
+        textImage.loadFromImage(image);
+        spriteImage.setTexture(textImage);
+        // Gérer les événements
         sf::Event event;
+        sf::Mouse mouse;
         while (window.pollEvent(event)) {
-
-            if (event.type == sf::Event::Closed)
+            if (event.type == sf::Event::KeyPressed) // Handling the closure of the renderwindow
+                if (event.key.code == sf::Keyboard::Key::Escape)
+                    window.close();
+            if (event.type == sf::Event::Closed) {
                 window.close();
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::B)) { choix = 1; }
-            else if (sf::Keyboard::isKeyPressed(sf::Keyboard::V)) { choix = 2; }
-            else { choix = 0; }
-
-            if (choix == 1) { std::cout << "bouger bleu" << std::endl; }
-
-            if (choix == 2) { 0; std::cout << "bouger vert" << std::endl; }
-        }
-
-        // Vérification des touches
-        if (choix == 1) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                circle.move(0.01f, 0.f); // Déplacer vers la droite
             }
-        }
-        if (choix == 2) {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                circle2.move(0.01f, 0.f); // Déplacer vers la droite
+            //if (event.type == sf::Event::MouseMoved) 
+            // std::cout << "X : " << mouse.getPosition(window).x << "  Y : " << mouse.getPosition(window).y << std::endl;
+
+            if (event.type == sf::Event::MouseButtonReleased) {
+
+                if (event.mouseButton.button == sf::Mouse::Left) {
+                    activeButton(stylo, mouse, window, styloB); //répeter pour chaque bouton
+                    if (styloB) pinceauB = false; // pas réussi a assembler les booléens des boutons dans un vecteur.
+                    activeButton(pinceau, mouse, window, pinceauB);
+                    if (pinceauB) styloB = false;
+                }
             }
         }
 
-        window.clear();
-        window.draw(circle);
-        window.draw(circle2);
+        if (styloB == true && mouse.getPosition(window).y > POS_LIGNE) { // pour ne pas dessiner sur le menu
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                image.setPixel(mouse.getPosition(window).x, mouse.getPosition(window).y, sf::Color::Black);
+            }
+        }
+        if (pinceauB == true && mouse.getPosition(window).y > POS_LIGNE) { // pour ne pas dessiner sur le menu
+            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                sf::CircleShape shape = sf::CircleShape(5);
+                shape.setPosition(mouse.getPosition(window).x, mouse.getPosition(window).y);
+                shape.setFillColor(sf::Color::Green);
+                dessin.push_back(shape);
+                window.draw(shape);
+            }
+        }
+
+        // Dessiner les éléments
+        window.clear(sf::Color::White);
+        for (sf::CircleShape shape : dessin) {
+            window.draw(shape);
+        }
+        window.draw(spriteImage);
+        window.draw(stylo);
+        window.draw(pinceau);
+        window.draw(ligne);
+
         window.display();
+
     }
 
     return 0;
