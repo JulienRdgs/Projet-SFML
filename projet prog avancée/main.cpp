@@ -111,13 +111,13 @@ int main() {
 
         // Dessiner les éléments
         window.clear(sf::Color::White);
-        for (sf::CircleShape shape : dessin) {
-            window.draw(shape);
-        }
         window.draw(spriteImage);
         window.draw(stylo);
         window.draw(pinceau);
         window.draw(ligne);
+        for (sf::CircleShape shape : dessin) {
+            window.draw(shape);
+        }
 
         window.display();
 
