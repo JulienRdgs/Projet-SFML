@@ -10,11 +10,11 @@ const int WINDOW_HEIGHT = 600;
 
 const float BUTTON_SIZE = 30.f;
 
-const float SET_ROW = 10.f;
+const float SET_ROW = 10.f; //écart entre les lignes
 
-const float POS_LIGNE = WINDOW_WIDTH * 0.15;
+const float POS_LIGNE = BUTTON_SIZE * 2 + SET_ROW * 3; // le menu a la place pour 2 lignes d'icones
 
-const float BUTTON_GAP = 15.f + BUTTON_SIZE;
+const float BUTTON_GAP = SET_ROW + BUTTON_SIZE; //pour éviter les calculs trop longs
 
 const float OUTLINE_THICK = 1.0f;
 
@@ -23,10 +23,12 @@ sf::Color setColor = sf::Color::Black;
 
 //VECTOR DES ETATS DES BOUTONS, ACTUELLEMENT INUTILE
 std::vector<bool> buttonState;
+
 //ETATS DES BOUTONS
 bool sourisB = false;
 bool styloB = false;
 bool pinceauB = false;
+bool gommeB = false;
 bool noirB = false;
 bool rougeB = false;
 bool bleuB = false;
@@ -69,6 +71,7 @@ int main() {
     buttonState.push_back(sourisB);
     buttonState.push_back(styloB);
     buttonState.push_back(pinceauB);
+    buttonState.push_back(gommeB);
     buttonState.push_back(noirB);
     buttonState.push_back(rougeB);
     buttonState.push_back(bleuB);
@@ -117,7 +120,7 @@ int main() {
     pinceau.setFillColor(sf::Color::White);
     defaultParam(pinceau);
     sf::Texture iconePinceau;
-    if (!iconePinceau.loadFromFile("asset/icone pinceau.png")) { std::cout << "erreur chargmenent icone pinceau" << std::endl; }
+    if (!iconePinceau.loadFromFile("asset/icone pinceau.png")) { std::cout << "erreur chargement icone pinceau" << std::endl; }
     pinceau.setTexture(&iconePinceau);
     boutons.push_back(pinceau);
 
@@ -130,7 +133,7 @@ int main() {
     diminuerTaille.setFillColor(sf::Color::White);
     defaultParam(diminuerTaille);
     sf::Texture flecheBas;
-    if (!flecheBas.loadFromFile("asset/icone down.png")) { std::cout << "erreur chargmenent icone pinceau" << std::endl; }
+    if (!flecheBas.loadFromFile("asset/icone down.png")) { std::cout << "erreur chargement icone down" << std::endl; }
     diminuerTaille.setTexture(&flecheBas);
     boutons.push_back(diminuerTaille);
 
@@ -141,9 +144,30 @@ int main() {
     augmenterTaille.setFillColor(sf::Color::White);
     defaultParam(augmenterTaille);
     sf::Texture flecheHaut;
-    if (!flecheHaut.loadFromFile("asset/icone up.png")) { std::cout << "erreur chargmenent icone pinceau" << std::endl; }
+    if (!flecheHaut.loadFromFile("asset/icone up.png")) { std::cout << "erreur chargement icone up" << std::endl; }
     augmenterTaille.setTexture(&flecheHaut);
     boutons.push_back(augmenterTaille);
+
+                        //TOUT EFFACER
+    sf::RectangleShape clearAll(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
+    clearAll.setPosition((WINDOW_WIDTH - BUTTON_SIZE) / 2, (POS_LIGNE - BUTTON_SIZE) / 2);
+    clearAll.setFillColor(sf::Color::White);
+    defaultParam(clearAll);
+    sf::Texture poubelle;
+    if (!poubelle.loadFromFile("asset/icone poubelle.png")) { std::cout << "erreur chargement icone poubelle" << std::endl; }
+    clearAll.setTexture(&poubelle);
+    boutons.push_back(clearAll);
+
+                        //GOMME
+    sf::RectangleShape gomme(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
+    gomme.setPosition(SET_ROW, SET_ROW + BUTTON_GAP);
+    gomme.setFillColor(sf::Color::White);
+    defaultParam(gomme);
+    sf::Texture iconeGomme;
+    if (!iconeGomme.loadFromFile("asset/icone gomme.png")) { std::cout << "erreur chargement icone gomme" << std::endl; }
+    gomme.setTexture(&iconeGomme);
+    boutons.push_back(gomme);
+
 
                         //COULEURS
     //NOIR
@@ -210,18 +234,21 @@ int main() {
 
                     // DESSINER/SOURIS
                     activeButton(souris, mouse, window, sourisB);
-                    if (sourisB) { styloB = false; pinceauB = false; }
+                    if (sourisB) { styloB = false; pinceauB = false; gommeB = false; }
 
                     activeButton(stylo, mouse, window, styloB);
-                    if (styloB) { pinceauB = false; sourisB = false; }
+                    if (styloB) { pinceauB = false; sourisB = false; gommeB = false; }
 
                     activeButton(pinceau, mouse, window, pinceauB);
-                    if (pinceauB) { styloB = false; sourisB = false; }
+                    if (pinceauB) { styloB = false; sourisB = false; gommeB = false; }
+
+                    activeButton(gomme, mouse, window, gommeB);
+                    if (gommeB) { styloB = false; sourisB = false; pinceauB = false; }
 
                     //TAILLE PINCEAU
                     if (diminuerTaille.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
                         std::cout << "taille pinceau : diminuer taille" << std::endl;
-                        if (currentSizePinceau <= 3) { currentSizePinceau = 1; }
+                        if (currentSizePinceau <= 3) { currentSizePinceau = 3; }
                         else { currentSizePinceau -= 3; }
                     }
                     if (augmenterTaille.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
@@ -249,14 +276,18 @@ int main() {
                     /*for (sf::RectangleShape bouton : boutons) {
                         activeButton(bouton,mouse,window,bouton.etat) //j'aurai pu faire un bail comme ça si les bools des boutons étaient dans leur classe
                     }*/
+
+                    if (clearAll.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                        dessin.clear();
+                        std::cout << "reset" << std::endl; //tout effacer, incompatible avec activeButton pck pas besoin de booléen
+                    }
                 }
             }
         }
-
-        if (styloB == true && mouse.getPosition(window).y >= POS_LIGNE-currentSizePinceau) { // pour ne pas dessiner sur le menu
+        if (styloB == true && mouse.getPosition(window).y >= POS_LIGNE-currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
             if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                 //image.setPixel(mouse.getPosition(window).x, mouse.getPosition(window).y, setColor);  anciennement pour setPixel sur une image
-                sf::CircleShape shape = sf::CircleShape(0.5);
+                sf::CircleShape shape = sf::CircleShape(1);
                 shape.setPosition(mouse.getPosition(window).x - shape.getRadius(), mouse.getPosition(window).y - shape.getRadius()); //centrer rond sur souris
                 shape.setFillColor(setColor);
                 dessin.push_back(shape);
@@ -264,11 +295,22 @@ int main() {
             }
         }
         if (pinceauB == true) {
-            if (mouse.getPosition(window).y >= POS_LIGNE-currentSizePinceau) { // pour ne pas dessiner sur le menu
+            if (mouse.getPosition(window).y >= POS_LIGNE-currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     sf::CircleShape shape = sf::CircleShape(currentSizePinceau);
                     shape.setPosition(mouse.getPosition(window).x - shape.getRadius(), mouse.getPosition(window).y - shape.getRadius());
                     shape.setFillColor(setColor);
+                    dessin.push_back(shape);
+                    window.draw(shape);
+                }
+            }
+        }
+        if (gommeB == true) {
+            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    sf::CircleShape shape = sf::CircleShape(currentSizePinceau);
+                    shape.setPosition(mouse.getPosition(window).x - shape.getRadius(), mouse.getPosition(window).y - shape.getRadius());
+                    shape.setFillColor(sf::Color::White);
                     dessin.push_back(shape);
                     window.draw(shape);
                 }
@@ -289,10 +331,18 @@ int main() {
         for (sf::RectangleShape& bouton : boutons) {
             window.draw(bouton);//tous les boutons
         }
-        std::cout << currentSizePinceau << std::endl;
         window.display();
 
     }
 
     return 0;
 }
+
+/*                            BAILS A FIX
+* 
+REMPLIRE L'ESPACE ENTRE LES RONDS
+
+DRAW LE CHOIX DES TAILLES UNIQUEMENT QUAND LE PINCEAU EST UTILISE
+
+DESACTIVER AUTOMATIQUEMENT LES BOOLEENS DES BOUTONS DANS LA FONCTIONE ACTIVEBUTTON()
+*/
