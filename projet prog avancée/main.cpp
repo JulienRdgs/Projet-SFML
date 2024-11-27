@@ -29,11 +29,13 @@ bool sourisB = false;
 bool styloB = false;
 bool pinceauB = false;
 bool gommeB = false;
+bool ecrireB = false;
 bool noirB = false;
 bool rougeB = false;
 bool bleuB = false;
 bool vertB = false;
 bool roseB = false;
+bool ecrireActif = false;
 
 //DETECTION D'ACTIVATION DE BOUTON
 void activeButton(sf::RectangleShape button, sf::Mouse mouse, sf::RenderWindow& window, bool& selec) {
@@ -65,6 +67,8 @@ void defaultParam(sf::RectangleShape& colorButton) { // actuellent ça ne save qu
 std::vector<sf::CircleShape> dessin;
 std::vector<sf::RectangleShape> boutons;
 
+std::string cinUserText;
+
 int main() {
 
     //PUSH_BACK DES ETATS DES BOUTONS, ACTUELLEMENT INUTILE
@@ -72,6 +76,7 @@ int main() {
     buttonState.push_back(styloB);
     buttonState.push_back(pinceauB);
     buttonState.push_back(gommeB);
+    buttonState.push_back(ecrireB);
     buttonState.push_back(noirB);
     buttonState.push_back(rougeB);
     buttonState.push_back(bleuB);
@@ -168,6 +173,16 @@ int main() {
     gomme.setTexture(&iconeGomme);
     boutons.push_back(gomme);
 
+                        //ECRIRE
+    sf::RectangleShape ecrire(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
+    ecrire.setPosition(SET_ROW + BUTTON_GAP, SET_ROW + BUTTON_GAP);
+    ecrire.setFillColor(sf::Color::White);
+    defaultParam(ecrire);
+    sf::Texture iconeEcrire;
+    if (!iconeEcrire.loadFromFile("asset/icone ecrire.png")) { std::cout << "erreur chargement icone ecrire" << std::endl; }
+    ecrire.setTexture(&iconeEcrire);
+    boutons.push_back(ecrire);
+
 
                         //COULEURS
     //NOIR
@@ -219,9 +234,23 @@ int main() {
         sf::Event event;
         sf::Mouse mouse;
         while (window.pollEvent(event)) {
-            if (event.type == sf::Event::KeyPressed)
-                if (event.key.code == sf::Keyboard::Key::Escape)
-                    window.close();
+            if (event.type == sf::Event::KeyPressed){
+                if (event.key.code == sf::Keyboard::Key::Escape) { window.close(); }
+                if (ecrireActif) {
+                    std::cout << "debut input text" << std::endl;
+                    cinUserText += sf::Event::KeyPressed;
+                    sf::Text userText;
+                    userText.setString(cinUserText);
+                    userText.setFont(font);
+                    userText.setPosition(mouse.getPosition(window).x, mouse.getPosition(window).y); //  ////////////////////////////////////PAS FINI, MARCHE PAS
+                    window.draw(userText);
+                    if (event.key.code == sf::Keyboard::Key::Enter) {
+                        ecrireActif = false;
+                        std::cout << "fin input text" << std::endl;
+                    }
+                }
+            }
+
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
@@ -234,16 +263,19 @@ int main() {
 
                     // DESSINER/SOURIS
                     activeButton(souris, mouse, window, sourisB);
-                    if (sourisB) { styloB = false; pinceauB = false; gommeB = false; }
+                    if (sourisB) { styloB = false; pinceauB = false; gommeB = false; ecrireB = false; }
 
                     activeButton(stylo, mouse, window, styloB);
-                    if (styloB) { pinceauB = false; sourisB = false; gommeB = false; }
+                    if (styloB) { pinceauB = false; sourisB = false; gommeB = false; ecrireB = false; }
 
                     activeButton(pinceau, mouse, window, pinceauB);
-                    if (pinceauB) { styloB = false; sourisB = false; gommeB = false; }
+                    if (pinceauB) { styloB = false; sourisB = false; gommeB = false; ecrireB = false; }
 
                     activeButton(gomme, mouse, window, gommeB);
-                    if (gommeB) { styloB = false; sourisB = false; pinceauB = false; }
+                    if (gommeB) { styloB = false; sourisB = false; pinceauB = false; ecrireB = false; }
+
+                    activeButton(ecrire, mouse, window, ecrireB);
+                    if (ecrireB) { styloB = false; sourisB = false; pinceauB = false; gommeB = false; }
 
                     //TAILLE PINCEAU
                     if (diminuerTaille.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
@@ -316,13 +348,21 @@ int main() {
                 }
             }
         }
+        if (ecrireB == true) {
+            if (mouse.getPosition(window).y > POS_LIGNE) { // écrire du texte uniquement sur le plan
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    ecrireB = false; //pour avoir uniquement 1 button press, à priorit ça n'arrête pas le if
+                    ecrireActif = true;
+                }
+            }
+        }
         /*else {
             diminuerTaille.setPosition(400, 400);
             augmenterTaille.setPosition(500 , 400);
         }*/
 
         //DESSINER
-        window.clear(sf::Color::White);
+        window.clear(sf::Color::White); //on peut ajouter un if ici qui permet de check si un bouton de choix de background est appuyé, un peu useless tho
         for (sf::CircleShape& shape : dessin) {
             window.draw(shape);//les cercles créés par le pinceau, a potentiellement changer
         }
@@ -345,4 +385,11 @@ REMPLIRE L'ESPACE ENTRE LES RONDS
 DRAW LE CHOIX DES TAILLES UNIQUEMENT QUAND LE PINCEAU EST UTILISE
 
 DESACTIVER AUTOMATIQUEMENT LES BOOLEENS DES BOUTONS DANS LA FONCTIONE ACTIVEBUTTON()
+
+DEMANDER : SI LA CONDITION D'UN IF EST UN TRUE, EST CE QUE SI JE MET CE BOOLEEN EN FALSE AU DEBUT DU IF, CELUI CI S'ARRETE ?
+           OU ALORS CA CONTINU PCK LE BOOLEEN ETAIT TRUE UNE FOIS ? (j'espère) C'EST POUR LE IF(ECRIREB) 
+
+           DEMANDER AUTREMENT : EST CE QUE LA CONDITION D'UN IF EST CHECK UNIQUEMENT AVANT LE IF, OU MEME PENDANT LE IF ?
+
+           PAS FINI FONCTION POUR ECRIRE
 */
