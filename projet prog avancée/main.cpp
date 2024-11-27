@@ -5,14 +5,8 @@
 #include <iostream>
 #include <vector>
 
-
-// Dimensions de la fenêtre
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-
-// Dimensions des raquettes
-const float PADDLE_WIDTH = 10.f;
-const float PADDLE_HEIGHT = 100.f;
 
 const float BUTTON_SIZE = 30.f;
 
@@ -24,49 +18,65 @@ const float BUTTON_GAP = 15.f + BUTTON_SIZE;
 
 const float OUTLINE_THICK = 1.0f;
 
+//COULEUR ACTUELLE
 sf::Color setColor = sf::Color::Black;
 
+//VECTOR DES ETATS DES BOUTONS, ACTUELLEMENT INUTILE
 std::vector<bool> buttonState;
+//ETATS DES BOUTONS
+bool sourisB = false;
 bool styloB = false;
 bool pinceauB = false;
+bool noirB = false;
 bool rougeB = false;
+bool bleuB = false;
+bool vertB = false;
 bool roseB = false;
 
+//DETECTION D'ACTIVATION DE BOUTON
 void activeButton(sf::RectangleShape button, sf::Mouse mouse, sf::RenderWindow& window, bool& selec) {
     if (button.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
         std::cout << "dessiner" << std::endl;
         selec = true;
-        for (bool bouton : buttonState) {
-            if (bouton != selec) {
-                bouton = false; //désactiver tous les autres boutons si après avoir cliqué sur un bouton
-            }
-        }
+        //for (bool bouton : buttonState) {
+        //    if (bouton != selec) {
+        //        bouton = false; //désactiver tous les autres boutons si après avoir cliqué sur un bouton
+        //    }
+        //}
         // ALTERNATIVE : modifier manuellement tous les autres états dans un if(etat=true) après chaque activeButton
 
-        for (bool bouton : buttonState) {
-            std::cout << bouton << std::endl;
-        }
+        /*for (bool bouton : buttonState) {
+            std::cout << bouton << std::endl; //debug pour vérif les états
+        }*/
         if (button.getFillColor() != sf::Color::White) { //si le bouton est une couleur, alors la couleur actuelle devient celle-ci
-            setColor = button.getFillColor(); 
+            setColor = button.getFillColor();
         }
     }
-}
+} //ajouter une condition pour éviter de changer de couleur quand la souris est activée ? faudrait faire une deuxième boucle copiée-collée ici
 
-void defaultParam(sf::RectangleShape &colorButton) { // actuellent ça ne save qu'une ligne, mais jsp si j'ajouterai des bails aux boutons
+
+void defaultParam(sf::RectangleShape& colorButton) { // actuellent ça ne save qu'une ligne, mais jsp si j'ajouterai des bails aux boutons
     colorButton.setOutlineThickness(OUTLINE_THICK);
     colorButton.setOutlineColor(sf::Color::Black);
 }
+
 
 std::vector<sf::CircleShape> dessin;
 std::vector<sf::RectangleShape> boutons;
 
 int main() {
 
+    //PUSH_BACK DES ETATS DES BOUTONS, ACTUELLEMENT INUTILE
+    buttonState.push_back(sourisB);
     buttonState.push_back(styloB);
     buttonState.push_back(pinceauB);
+    buttonState.push_back(noirB);
     buttonState.push_back(rougeB);
+    buttonState.push_back(bleuB);
+    buttonState.push_back(vertB);
     buttonState.push_back(roseB);
 
+    //IMAGE POUR SETPIXEL, POTENTIELLEMENT A SUPPRIMER
     sf::Image image;
     image.create(WINDOW_WIDTH, WINDOW_HEIGHT, sf::Color::White);
     sf::Texture textImage;
@@ -74,8 +84,7 @@ int main() {
     sf::Sprite spriteImage;
     spriteImage.setTexture(textImage);
 
-    
-
+    //AU CAS OU
     sf::Font font;
     if (!font.loadFromFile("asset/arial.ttf")) { std::cout << "erreur chargement arial" << std::endl; }
 
@@ -83,6 +92,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Paint SFML JRdgs");
     window.setFramerateLimit(60);
 
+    //SOURIS
     sf::RectangleShape souris(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
     souris.setPosition(SET_ROW, SET_ROW);
     souris.setFillColor(sf::Color::White);
@@ -92,6 +102,7 @@ int main() {
     souris.setTexture(&iconeSouris);
     boutons.push_back(souris);
 
+    //STYLO
     sf::RectangleShape stylo(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
     stylo.setPosition(SET_ROW + BUTTON_GAP, SET_ROW);
     stylo.setFillColor(sf::Color::White);
@@ -101,8 +112,9 @@ int main() {
     stylo.setTexture(&iconeStylo);
     boutons.push_back(stylo);
 
+    //PINCEAU
     sf::RectangleShape pinceau(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
-    pinceau.setPosition(SET_ROW + BUTTON_GAP*2, SET_ROW);
+    pinceau.setPosition(SET_ROW + BUTTON_GAP * 2, SET_ROW);
     pinceau.setFillColor(sf::Color::White);
     defaultParam(pinceau);
     sf::Texture iconePinceau;
@@ -110,30 +122,59 @@ int main() {
     pinceau.setTexture(&iconePinceau);
     boutons.push_back(pinceau);
 
+    //TAILLE PINCEAU
+    int currentSizePinceau = 10;
+    sf::RectangleShape diminuerTaille(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
+    diminuerTaille.setPosition(SET_ROW + BUTTON_GAP * 3, SET_ROW);
+    diminuerTaille.setFillColor(sf::Color::White);
+    defaultParam(diminuerTaille);
+    sf::Texture flecheBas;
+    if (!flecheBas.loadFromFile("asset/icone down.png")) { std::cout << "erreur chargmenent icone pinceau" << std::endl; }
+    diminuerTaille.setTexture(&flecheBas);
+    boutons.push_back(diminuerTaille);
+
+    sf::RectangleShape augmenterTaille(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
+    augmenterTaille.setPosition(SET_ROW + BUTTON_GAP * 4, SET_ROW);
+    augmenterTaille.setFillColor(sf::Color::White);
+    defaultParam(augmenterTaille);
+    sf::Texture flecheHaut;
+    if (!flecheHaut.loadFromFile("asset/icone up.png")) { std::cout << "erreur chargmenent icone pinceau" << std::endl; }
+    augmenterTaille.setTexture(&flecheHaut);
+    boutons.push_back(augmenterTaille);
+
+    //COULEURS
+//NOIR
+    sf::RectangleShape noir(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
+    noir.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE, SET_ROW);
+    noir.setFillColor(sf::Color::Black);
+    defaultParam(noir);
+    boutons.push_back(noir);
+    //ROUGE
     sf::RectangleShape rouge(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
-    rouge.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE, SET_ROW);
+    rouge.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP, SET_ROW);
     rouge.setFillColor(sf::Color::Red);
     defaultParam(rouge);
     boutons.push_back(rouge);
-
+    //BLEU
     sf::RectangleShape bleu(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
-    bleu.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP, SET_ROW);
+    bleu.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 2, SET_ROW);
     bleu.setFillColor(sf::Color::Blue);
     defaultParam(bleu);
     boutons.push_back(bleu);
-
+    //VERT
     sf::RectangleShape vert(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
-    vert.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 2, SET_ROW);
+    vert.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 3, SET_ROW);
     vert.setFillColor(sf::Color::Green);
     defaultParam(vert);
     boutons.push_back(vert);
-
+    //ROSE
     sf::RectangleShape rose(sf::Vector2f(BUTTON_SIZE, BUTTON_SIZE));
-    rose.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 3, SET_ROW);
-    rose.setFillColor(sf::Color(255,0,255));
+    rose.setPosition(WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 4, SET_ROW);
+    rose.setFillColor(sf::Color(255, 0, 255));
     defaultParam(rose);
     boutons.push_back(rose);
 
+    //LIGNE SEPARATRICE
     sf::VertexArray ligne(sf::Lines);
     ligne.append(sf::Vertex(sf::Vector2f(0, POS_LIGNE), sf::Color::Black));
     ligne.append(sf::Vertex(sf::Vector2f(WINDOW_WIDTH, POS_LIGNE), sf::Color::Black));
@@ -159,10 +200,38 @@ int main() {
             if (event.type == sf::Event::MouseButtonReleased) {
 
                 if (event.mouseButton.button == sf::Mouse::Left) {
+                    // DESSINER/SOURIS
+                    activeButton(souris, mouse, window, sourisB);
+                    if (sourisB) { styloB = false; pinceauB = false; }
                     activeButton(stylo, mouse, window, styloB);
+                    if (styloB) { pinceauB = false; sourisB = false; }
                     activeButton(pinceau, mouse, window, pinceauB);
+                    if (pinceauB) { styloB = false; sourisB = false; }
+                    //TAILLE PINCEAU
+                    if (diminuerTaille.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                        std::cout << "taille pinceau : diminuer taille" << std::endl;
+                        currentSizePinceau -= 3;
+                    }
+                    if (augmenterTaille.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                        std::cout << "taille pinceau : augmenter taille" << std::endl;
+                        currentSizePinceau += 3;
+                    }
+
+                    // COULEURS
+                    activeButton(noir, mouse, window, noirB);
+                    if (noirB) { rougeB = false;  roseB = false; }
                     activeButton(rouge, mouse, window, rougeB);
+                    if (rougeB) { roseB = false; noirB = false; }
+                    activeButton(bleu, mouse, window, bleuB);
+                    if (bleuB) { rougeB = false; noirB = false; }
+                    activeButton(vert, mouse, window, vertB);
+                    if (vertB) { rougeB = false; noirB = false; }
                     activeButton(rose, mouse, window, roseB);
+                    if (roseB) { rougeB = false; noirB = false; }
+
+                    /*for (sf::RectangleShape bouton : boutons) {
+                        activeButton(bouton,mouse,window,bouton.etat) //j'aurai pu faire un bail comme ça si les bools des boutons étaient dans leur classe
+                    }*/
                 }
             }
         }
@@ -172,13 +241,15 @@ int main() {
                 image.setPixel(mouse.getPosition(window).x, mouse.getPosition(window).y, setColor);
             }
         }
-        if (pinceauB == true && mouse.getPosition(window).y > POS_LIGNE) { // pour ne pas dessiner sur le menu
-            if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                sf::CircleShape shape = sf::CircleShape(5);
-                shape.setPosition(mouse.getPosition(window).x, mouse.getPosition(window).y);
-                shape.setFillColor(setColor);
-                dessin.push_back(shape);
-                window.draw(shape);
+        if (pinceauB == true) {
+            if (mouse.getPosition(window).y > POS_LIGNE) { // pour ne pas dessiner sur le menu
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    sf::CircleShape shape = sf::CircleShape(currentSizePinceau);
+                    shape.setPosition(mouse.getPosition(window).x, mouse.getPosition(window).y);
+                    shape.setFillColor(setColor);
+                    dessin.push_back(shape);
+                    window.draw(shape);
+                }
             }
         }
 
@@ -186,10 +257,10 @@ int main() {
         window.clear(sf::Color::White);
         window.draw(spriteImage);//l'image pour le setPixel du stylo, a potentiellement changer
         window.draw(ligne); //la ligne qui sépare les boutons de l'espace de dessin
-        for (sf::RectangleShape &bouton : boutons) {
+        for (sf::RectangleShape& bouton : boutons) {
             window.draw(bouton);//tous les boutons
         }
-        for (sf::CircleShape &shape : dessin) {
+        for (sf::CircleShape& shape : dessin) {
             window.draw(shape);//les cercles créés par le pinceau, a potentiellement changer
         }
 
