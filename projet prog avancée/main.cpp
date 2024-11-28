@@ -5,26 +5,26 @@
 #include <iostream>
 #include <vector>
 
+                    //CONST
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
-
 const float BUTTON_SIZE = 30.f;
-
 const float SET_ROW = 10.f; //écart entre les lignes
-
 const float POS_LIGNE = BUTTON_SIZE * 2 + SET_ROW * 3; // le menu a la place pour 2 lignes d'icones
-
 const float BUTTON_GAP = SET_ROW + BUTTON_SIZE; //pour éviter les calculs trop longs
-
 const float OUTLINE_THICK = 1.0f;
 
+                    //VARIABLES
 unsigned int currentSizePinceau = 10;
-
-//COULEUR ACTUELLE
+bool ecrireActif = false;
+std::string cinUserText;
 sf::Color currentColor = sf::Color::Black;
 
+                    //VECTEURS
 std::vector<sf::CircleShape> vectorDrawing;
+//std::vector<allButtons> vectorButtons;
 
+                    //CLASSE DES BOUTONS
 class allButtons : public sf::RectangleShape {
 public :
     
@@ -86,6 +86,7 @@ public :
     } //ajouter une condition pour éviter de changer de couleur quand la souris est activée ? faudrait faire une deuxième boucle copiée-collée ici
 };
 
+                    //POUR ENTOURER L'OUTIL ACTIF
 void showActiveButton(allButtons &bouton) {
     if (bouton.id.substr(0, 3) != "Col") {
         //ajouter ici un if substr == "Mod" avec la meme fonction qu'en dessous mais set à genre 100 millisecondes
@@ -105,12 +106,6 @@ void showActiveButton(allButtons &bouton) {
         }
     }
 }
-
-//std::vector<allButtons> vectorButtons;
-
-bool ecrireActif = false;
-
-std::string cinUserText;
 
 int main() {
                         //IMAGE POUR LE BACKGROUND DU MENU
@@ -219,6 +214,7 @@ int main() {
     ligne.append(sf::Vertex(sf::Vector2f(0, POS_LIGNE), sf::Color::Black));
     ligne.append(sf::Vertex(sf::Vector2f(WINDOW_WIDTH, POS_LIGNE), sf::Color::Black));
 
+                        //BOUCLE PRINCIPALE
     while (window.isOpen()) {
 
         textImage.loadFromImage(image);
@@ -226,6 +222,8 @@ int main() {
         
         sf::Event event;
         sf::Mouse mouse;
+
+                        //BOUCLE D'EVENEMENTS
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::KeyPressed){
                 if (event.key.code == sf::Keyboard::Key::Escape) { window.close(); }
@@ -248,11 +246,9 @@ int main() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-            //if (event.type == sf::Event::MouseMoved) 
-            // std::cout << "X : " << mouse.getPosition(window).x << "  Y : " << mouse.getPosition(window).y << std::endl;
-
+            
+                            //DETECTION DES CLIQUES SUR ICONES
             if (event.type == sf::Event::MouseButtonPressed) {
-
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     if (souris.turnOnCheck(souris, mouse, window)) {
                         stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false;
@@ -296,7 +292,7 @@ int main() {
                 }
             }
         }
-
+                            //QUE FAIRE QUAND ICONE ACTIVE                
         if (stylo.buttonState) {
             if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -354,12 +350,12 @@ int main() {
         showActiveButton(vert);
         showActiveButton(rose);
 
-        //DESSINER
-        window.clear(sf::Color::White); //on peut ajouter un if ici qui permet de check si un bouton de choix de background est appuyé, un peu useless tho
+                            //DESSINER
+        window.clear(sf::Color::White);
         for (sf::CircleShape& shape : vectorDrawing) {
-            window.draw(shape);//les cercles créés par le pinceau, a potentiellement changer
+            window.draw(shape);
         }
-        window.draw(spriteImage);
+        window.draw(spriteImage);//background du menu (pour éviter de dessiner dessus)
         window.draw(ligne); //la ligne qui sépare les boutons de l'espace de dessin
 
         window.draw(souris);
@@ -382,24 +378,6 @@ int main() {
             window.draw(augmenterTaille);
         }
         window.display();
-
     }
-
     return 0;
 }
-
-/*                            BAILS A FIX
-* 
-REMPLIRE L'ESPACE ENTRE LES RONDS
-
-DRAW LE CHOIX DES TAILLES UNIQUEMENT QUAND LE PINCEAU EST UTILISE
-
-DESACTIVER AUTOMATIQUEMENT LES BOOLEENS DES BOUTONS DANS LA FONCTIONE ACTIVEBUTTON()
-
-DEMANDER : SI LA CONDITION D'UN IF EST UN TRUE, EST CE QUE SI JE MET CE BOOLEEN EN FALSE AU DEBUT DU IF, CELUI CI S'ARRETE ?
-           OU ALORS CA CONTINU PCK LE BOOLEEN ETAIT TRUE UNE FOIS ? (j'espère) C'EST POUR LE IF(ECRIREB) 
-
-           DEMANDER AUTREMENT : EST CE QUE LA CONDITION D'UN IF EST CHECK UNIQUEMENT AVANT LE IF, OU MEME PENDANT LE IF ?
-
-           PAS FINI FONCTION POUR ECRIRE
-*/
