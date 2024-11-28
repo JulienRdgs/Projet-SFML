@@ -42,23 +42,40 @@ public :
     //DETECTION D'ACTIVATION DE BOUTON
     void turnOnCheck(allButtons& button, sf::Mouse mouse, sf::RenderWindow& window) {
         if (button.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
-            std::cout << "dessiner" << std::endl;
-            if (button.id != "diminuerTaille" || button.id != "augmenterTaille" || button.id != "clearAll") {
+            if (button.id != "diminuerTaille" && button.id != "augmenterTaille" && button.id != "clearAll") {
                 button.buttonState = true;
+                system("cls");
+                std::cout << button.id << std::endl;
             }
             if (button.id == "diminuerTaille") {
-                if (currentSizePinceau <= 4) { std::cout << "min size" << std::endl; currentSizePinceau = 3; }
-                else { currentSizePinceau -= 3; }
-                std::cout << currentSizePinceau << std::endl;
+                if (currentSizePinceau <= 4) { 
+                    currentSizePinceau = 3;
+                    system("cls");
+                    std::cout << "min size : " << currentSizePinceau << std::endl;
+                }
+                else { 
+                    currentSizePinceau -= 3;
+                    system("cls");
+                    std::cout << "size down : " << currentSizePinceau << std::endl;
+                }
             } 
             if (button.id == "augmenterTaille") {
-                if (currentSizePinceau >= 37) { std::cout << "max size" << std::endl; currentSizePinceau = 40; }
-                else { currentSizePinceau += 3; }
-                std::cout << currentSizePinceau << std::endl;
+                if (currentSizePinceau >= 37) { 
+                    currentSizePinceau = 40;
+                    system("cls");
+                    std::cout << "max size : " << currentSizePinceau << std::endl;
+                }
+                else { 
+                    currentSizePinceau += 3;
+                    system("cls");
+                    std::cout << "size up : " << currentSizePinceau << std::endl;
+                }
             }
+            if (button.id == "pinceau") std::cout << "current size : " << currentSizePinceau << std::endl;
             if (button.id == "clearAll") {
                 vectorDrawing.clear();
-                std::cout << "reset" << std::endl;
+                system("cls");
+                std::cout << "all cleared" << std::endl;
             }
             if (button.getFillColor() != sf::Color::White) { //si le bouton est une couleur, alors la couleur actuelle devient celle-ci
                 currentColor = button.getFillColor();
@@ -155,23 +172,23 @@ int main() {
 
                         //COULEURS
     //NOIR
-    allButtons noir("couleur noir", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE, SET_ROW, sf::Color::Black);
+    allButtons noir("C noir", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE, SET_ROW, sf::Color::Black);
     vectorButtons.push_back(noir);
 
     //ROUGE
-    allButtons rouge("couleur rouge", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP, SET_ROW, sf::Color::Red);
+    allButtons rouge("C rouge", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP, SET_ROW, sf::Color::Red);
     vectorButtons.push_back(rouge);
 
     //BLEU
-    allButtons bleu("couleur bleu", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 2, SET_ROW, sf::Color::Blue);
+    allButtons bleu("C bleu", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 2, SET_ROW, sf::Color::Blue);
     vectorButtons.push_back(bleu);
 
     //VERT
-    allButtons vert("couleur vert", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 3, SET_ROW, sf::Color::Green);
+    allButtons vert("C vert", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 3, SET_ROW, sf::Color::Green);
     vectorButtons.push_back(vert);
 
     //ROSE
-    allButtons rose("couleur rose", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 4, SET_ROW, sf::Color(255, 0, 255));
+    allButtons rose("C rose", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 4, SET_ROW, sf::Color(255, 0, 255));
     vectorButtons.push_back(rose);
 
     //LIGNE SEPARATRICE
