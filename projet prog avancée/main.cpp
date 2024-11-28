@@ -25,7 +25,7 @@ sf::Color currentColor = sf::Color::Black;
 
 std::vector<sf::CircleShape> vectorDrawing;
 
-class allButtons : public sf::RectangleShape{
+class allButtons : public sf::RectangleShape {
 public :
     
     bool buttonState = false;
@@ -42,7 +42,7 @@ public :
     //DETECTION D'ACTIVATION DE BOUTON
     bool turnOnCheck(allButtons& button, sf::Mouse mouse, sf::RenderWindow& window) {
         if (button.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
-            if (button.id.substr(0,3) != "Mod") { //pour séparer les outils des modificateurs et couleurs
+            if (button.id.substr(0, 3) != "Mod") { //pour séparer les outils des modificateurs et couleurs
                 button.buttonState = true;
                 system("cls");
                 std::cout << button.id << std::endl; //montrer le choix de bouton dans la console
@@ -81,7 +81,7 @@ public :
                 std::cout << "all cleared" << std::endl;
             }
             return true;
-        } 
+        }
         else { return false; }
     } //ajouter une condition pour éviter de changer de couleur quand la souris est activée ? faudrait faire une deuxième boucle copiée-collée ici
 };
@@ -113,15 +113,15 @@ bool ecrireActif = false;
 std::string cinUserText;
 
 int main() {
-    //IMAGE POUR LE BACKGROUND DU MENU
+                        //IMAGE POUR LE BACKGROUND DU MENU
     sf::Image image;
-    image.create(WINDOW_WIDTH, POS_LIGNE, sf::Color(222,222,222));
+    image.create((unsigned int)WINDOW_WIDTH, (unsigned int)POS_LIGNE, sf::Color(222,222,222)); //(unsigned int) c'est pour éviter les avertissements
     sf::Texture textImage;
     textImage.loadFromImage(image);
     sf::Sprite spriteImage;
     spriteImage.setTexture(textImage);
 
-    //AU CAS OU
+                        //FONT
     sf::Font font;
     if (!font.loadFromFile("asset/arial.ttf")) { std::cout << "erreur chargement arial" << std::endl; }
 
@@ -147,10 +147,14 @@ int main() {
     allButtons pinceau("pinceau", SET_ROW + BUTTON_GAP * 2, SET_ROW, sf::Color::White);
     sf::Texture iconePinceau;
     //sf::Image iconeApp;
-    if (!iconePinceau.loadFromFile("asset/icone pinceau.png") /*&& !iconeApp.loadFromFile("asset/icone pinceau.png")*/) { std::cout << "erreur chargement icone pinceau" << std::endl; }
+    if (!iconePinceau.loadFromFile("asset/icone pinceau.png")) { std::cout << "erreur chargement icone pinceau" << std::endl; }
     pinceau.setTexture(&iconePinceau);
     //vectorButtons.push_back(pinceau);
-    // window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr());
+
+    //POUR MODIF L'ICONE DE L'APP
+    /*sf::Image iconeApp;
+    if(!iconeApp.loadFromFile("asset/icone pinceau.png")) { std::cout << "erreur chargement icone appli" << std::endl; }
+    window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr());*/
 
                         //TAILLE PINCEAU
     //DIMINUER
@@ -210,7 +214,7 @@ int main() {
     allButtons rose("Col rose", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 4, SET_ROW, sf::Color(255, 0, 255));
     //vectorButtons.push_back(rose);
 
-    //LIGNE SEPARATRICE
+                        //LIGNE SEPARATRICE
     sf::VertexArray ligne(sf::Lines);
     ligne.append(sf::Vertex(sf::Vector2f(0, POS_LIGNE), sf::Color::Black));
     ligne.append(sf::Vertex(sf::Vector2f(WINDOW_WIDTH, POS_LIGNE), sf::Color::Black));
@@ -273,38 +277,25 @@ int main() {
                         augmenterTaille.turnOnCheck(augmenterTaille, mouse, window);
                     }
                     if (pinceau.buttonState || stylo.buttonState){
-                        if (noir.turnOnCheck(noir, mouse, window)); {
+                        if (noir.turnOnCheck(noir, mouse, window)) {
                             rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; rose.buttonState = false;
                         }
-                        if (rouge.turnOnCheck(rouge, mouse, window)); {
+                        if (rouge.turnOnCheck(rouge, mouse, window)) {
                             noir.buttonState = false; bleu.buttonState = false; vert.buttonState = false; rose.buttonState = false;
                         }
-                        if (bleu.turnOnCheck(bleu, mouse, window)); {
+                        if (bleu.turnOnCheck(bleu, mouse, window)) {
                             rouge.buttonState = false; noir.buttonState = false; vert.buttonState = false; rose.buttonState = false;
                         }
-                        if (vert.turnOnCheck(vert, mouse, window)); {
+                        if (vert.turnOnCheck(vert, mouse, window)) {
                             rouge.buttonState = false; bleu.buttonState = false; noir.buttonState = false; rose.buttonState = false;
                         }
-                        if (rose.turnOnCheck(rose, mouse, window)); {
+                        if (rose.turnOnCheck(rose, mouse, window)) {
                             rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; noir.buttonState = false;
                         }
                     }
                 }
             }
         }
-        showActiveButton(souris);
-        showActiveButton(stylo);
-        showActiveButton(pinceau);
-        showActiveButton(diminuerTaille);
-        showActiveButton(augmenterTaille);
-        showActiveButton(gomme);
-        showActiveButton(clearAll); //manuellement car pas réussi à modifier l'outLine d'un objet qui se trouve dans un vecteur
-        showActiveButton(ecrire);
-        showActiveButton(noir);
-        showActiveButton(rouge);
-        showActiveButton(bleu);
-        showActiveButton(vert);
-        showActiveButton(rose);
 
         if (stylo.buttonState) {
             if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) {
@@ -322,7 +313,7 @@ int main() {
         if (pinceau.buttonState) {
             if (mouse.getPosition(window).y >= POS_LIGNE-currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    sf::CircleShape shape = sf::CircleShape(currentSizePinceau);
+                    sf::CircleShape shape = sf::CircleShape((float)currentSizePinceau); //(float) c'est pour enlever avertissement
                     shape.setPosition(mouse.getPosition(window).x - shape.getRadius(), mouse.getPosition(window).y - shape.getRadius());
                     shape.setFillColor(currentColor);
                     vectorDrawing.push_back(shape);
@@ -333,7 +324,7 @@ int main() {
         if (gomme.buttonState) {
             if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    sf::CircleShape shape = sf::CircleShape(currentSizePinceau);
+                    sf::CircleShape shape = sf::CircleShape((float)currentSizePinceau); //(float) c'est pour enlever avertissement
                     shape.setPosition(mouse.getPosition(window).x - shape.getRadius(), mouse.getPosition(window).y - shape.getRadius());
                     shape.setFillColor(sf::Color::White);
                     vectorDrawing.push_back(shape);
@@ -349,6 +340,19 @@ int main() {
         //        }
         //    }
         //}
+        showActiveButton(souris);
+        showActiveButton(stylo);
+        showActiveButton(pinceau);
+        showActiveButton(diminuerTaille);
+        showActiveButton(augmenterTaille);
+        showActiveButton(gomme);
+        showActiveButton(clearAll); //manuellement car pas réussi à modifier l'outLine d'un objet qui se trouve dans un vecteur
+        showActiveButton(ecrire);
+        showActiveButton(noir);
+        showActiveButton(rouge);
+        showActiveButton(bleu);
+        showActiveButton(vert);
+        showActiveButton(rose);
 
         //DESSINER
         window.clear(sf::Color::White); //on peut ajouter un if ici qui permet de check si un bouton de choix de background est appuyé, un peu useless tho
