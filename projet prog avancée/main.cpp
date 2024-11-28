@@ -19,6 +19,7 @@ unsigned int currentSizePinceau = 10;
 bool ecrireActif = false;
 std::string cinUserText;
 sf::Color currentColor = sf::Color::Black;
+sf::Color backgroundChoice = sf::Color::White;
 
                     //VECTEURS
 std::vector<sf::CircleShape> vectorDrawing;
@@ -187,6 +188,13 @@ int main() {
     ecrire.setTexture(&iconeEcrire);
     //vectorButtons.push_back(ecrire);
 
+                        //CHANGER COULEUR BACKGROUND
+    allButtons backgroundColor("backgroundColor", SET_ROW, SET_ROW + BUTTON_GAP, sf::Color::White);
+    sf::Texture iconeBackgroundColor;
+    if (!iconeBackgroundColor.loadFromFile("asset/icone background.png")) { std::cout << "erreur chargement icone background" << std::endl; }
+    backgroundColor.setTexture(&iconeBackgroundColor);
+    //vectorButtons.push_back(backgroundColor);
+
 
                         //COULEURS
     //NOIR
@@ -202,12 +210,16 @@ int main() {
     //vectorButtons.push_back(bleu);
 
     //VERT
-    allButtons vert("Col vert", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 3, SET_ROW, sf::Color::Green);
+    allButtons vert("Col vert", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP, SET_ROW + BUTTON_GAP, sf::Color::Green);
     //vectorButtons.push_back(vert);
 
     //ROSE
-    allButtons rose("Col rose", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 4, SET_ROW, sf::Color(255, 0, 255));
+    allButtons rose("Col rose", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE - BUTTON_GAP * 2, SET_ROW + BUTTON_GAP, sf::Color(255, 0, 255));
     //vectorButtons.push_back(rose);
+    
+    //BLANC //sert uniquement à intuitivement changer la couleur du background en blanc. actuellement, c'est le même bouton que la gomme.
+    allButtons blanc("Col blanc", WINDOW_WIDTH - SET_ROW - BUTTON_SIZE, SET_ROW + BUTTON_GAP, sf::Color::White);
+    //vectorButtons.push_back(blanc);
 
                         //LIGNE SEPARATRICE
     sf::VertexArray ligne(sf::Lines);
@@ -251,19 +263,24 @@ int main() {
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     if (souris.turnOnCheck(souris, mouse, window)) {
-                        stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false;
+                        stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false; backgroundColor.buttonState = false;
                     }
                     if (stylo.turnOnCheck(stylo, mouse, window)) {
-                        souris.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false; 
+                        souris.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false; backgroundColor.buttonState = false;
                     }
                     if (pinceau.turnOnCheck(pinceau, mouse, window)) {
-                        souris.buttonState = false; stylo.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false; 
+                        souris.buttonState = false; stylo.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false; backgroundColor.buttonState = false;
                     } 
                     if (gomme.turnOnCheck(gomme, mouse, window)) {
-                        souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; ecrire.buttonState = false; 
+                        souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; ecrire.buttonState = false; backgroundColor.buttonState = false;
                     }
                     if (ecrire.turnOnCheck(ecrire, mouse, window)) {
-                        souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; 
+                        souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; backgroundColor.buttonState = false;
+                    }
+                    if (backgroundColor.turnOnCheck(backgroundColor, mouse, window)) {
+                        souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; ecrire.buttonState = false;
+                        rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; noir.buttonState = false; rose.buttonState = false; blanc.buttonState = false;
+                        //désactiver les couleurs en plus pour ne pas appliquer une couleur au background dès qu'on clique sur le seau
                     }
 
                     clearAll.turnOnCheck(clearAll, mouse, window);
@@ -272,21 +289,24 @@ int main() {
                         diminuerTaille.turnOnCheck(diminuerTaille, mouse, window);
                         augmenterTaille.turnOnCheck(augmenterTaille, mouse, window);
                     }
-                    if (pinceau.buttonState || stylo.buttonState){
+                    if (pinceau.buttonState || stylo.buttonState || backgroundColor.buttonState){
                         if (noir.turnOnCheck(noir, mouse, window)) {
-                            rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; rose.buttonState = false;
+                            rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; rose.buttonState = false; blanc.buttonState = false;
                         }
                         if (rouge.turnOnCheck(rouge, mouse, window)) {
-                            noir.buttonState = false; bleu.buttonState = false; vert.buttonState = false; rose.buttonState = false;
+                            noir.buttonState = false; bleu.buttonState = false; vert.buttonState = false; rose.buttonState = false; blanc.buttonState = false;
                         }
                         if (bleu.turnOnCheck(bleu, mouse, window)) {
-                            rouge.buttonState = false; noir.buttonState = false; vert.buttonState = false; rose.buttonState = false;
+                            rouge.buttonState = false; noir.buttonState = false; vert.buttonState = false; rose.buttonState = false; blanc.buttonState = false;
                         }
                         if (vert.turnOnCheck(vert, mouse, window)) {
-                            rouge.buttonState = false; bleu.buttonState = false; noir.buttonState = false; rose.buttonState = false;
+                            rouge.buttonState = false; bleu.buttonState = false; noir.buttonState = false; rose.buttonState = false; blanc.buttonState = false;
                         }
                         if (rose.turnOnCheck(rose, mouse, window)) {
-                            rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; noir.buttonState = false;
+                            rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; noir.buttonState = false; blanc.buttonState = false;
+                        }
+                        if (blanc.turnOnCheck(blanc, mouse, window)) {
+                            rouge.buttonState = false; bleu.buttonState = false; vert.buttonState = false; noir.buttonState = false; rose.buttonState = false;
                         }
                     }
                 }
@@ -328,6 +348,14 @@ int main() {
                 }
             }
         }
+        if (backgroundColor.buttonState) {
+            if (noir.buttonState) backgroundChoice = noir.getFillColor();
+            if (rouge.buttonState) backgroundChoice = rouge.getFillColor();
+            if (bleu.buttonState) backgroundChoice = bleu.getFillColor();
+            if (vert.buttonState) backgroundChoice = vert.getFillColor();
+            if (rose.buttonState) backgroundChoice = rose.getFillColor();
+            if (blanc.buttonState) backgroundChoice = blanc.getFillColor();
+        }
         //if (ecrire.buttonState) {
         //    if (mouse.getPosition(window).y > POS_LIGNE) { // écrire du texte uniquement sur le plan
         //        if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
@@ -344,14 +372,16 @@ int main() {
         showActiveButton(gomme);
         showActiveButton(clearAll); //manuellement car pas réussi à modifier l'outLine d'un objet qui se trouve dans un vecteur
         showActiveButton(ecrire);
+        showActiveButton(backgroundColor);
         showActiveButton(noir);
         showActiveButton(rouge);
         showActiveButton(bleu);
         showActiveButton(vert);
         showActiveButton(rose);
+        showActiveButton(blanc);
 
                             //DESSINER
-        window.clear(sf::Color::White);
+        window.clear(backgroundChoice);
         for (sf::CircleShape& shape : vectorDrawing) {
             window.draw(shape);
         }
@@ -369,6 +399,8 @@ int main() {
         window.draw(bleu);
         window.draw(vert);
         window.draw(rose);
+        window.draw(blanc);
+        window.draw(backgroundColor);
         //for (allButtons &bouton : vectorButtons) {
         //    window.draw(bouton);//tous les boutons 
         //}//ça fonctionnait mais le fait que les boutons sont dans un vecteur m'empechait de changer leur outLine.
