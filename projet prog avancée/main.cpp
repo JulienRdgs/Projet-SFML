@@ -40,19 +40,21 @@ public :
     };
 
     //DETECTION D'ACTIVATION DE BOUTON
-    bool turnOnCheck(allButtons& button, sf::Mouse mouse, sf::RenderWindow& window) {
+    void turnOnCheck(allButtons& button, sf::Mouse mouse, sf::RenderWindow& window) {
         if (button.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
             std::cout << "dessiner" << std::endl;
             if (button.id != "diminuerTaille" || button.id != "augmenterTaille" || button.id != "clearAll") {
                 button.buttonState = true;
             }
             if (button.id == "diminuerTaille") {
-                if (currentSizePinceau <= 3) { std::cout << "min size" << std::endl; currentSizePinceau = 3; }
+                if (currentSizePinceau <= 4) { std::cout << "min size" << std::endl; currentSizePinceau = 3; }
                 else { currentSizePinceau -= 3; }
+                std::cout << currentSizePinceau << std::endl;
             } 
             if (button.id == "augmenterTaille") {
                 if (currentSizePinceau >= 37) { std::cout << "max size" << std::endl; currentSizePinceau = 40; }
                 else { currentSizePinceau += 3; }
+                std::cout << currentSizePinceau << std::endl;
             }
             if (button.id == "clearAll") {
                 vectorDrawing.clear();
@@ -61,9 +63,7 @@ public :
             if (button.getFillColor() != sf::Color::White) { //si le bouton est une couleur, alors la couleur actuelle devient celle-ci
                 currentColor = button.getFillColor();
             }
-            return true;
         }
-        return false;
     } //ajouter une condition pour éviter de changer de couleur quand la souris est activée ? faudrait faire une deuxième boucle copiée-collée ici
 };
 
@@ -178,8 +178,6 @@ int main() {
     sf::VertexArray ligne(sf::Lines);
     ligne.append(sf::Vertex(sf::Vector2f(0, POS_LIGNE), sf::Color::Black));
     ligne.append(sf::Vertex(sf::Vector2f(WINDOW_WIDTH, POS_LIGNE), sf::Color::Black));
-
-    //if (stylo.buttonState) std::cout << "STYLOOOOOOOOOOOOOOO" << std::endl;
 
     while (window.isOpen()) {
 
