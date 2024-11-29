@@ -405,7 +405,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
             }
         }
         if (stylo.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
+            if (mouse.getPosition(window).y >= POS_LIGNE - SET_ROW) { // pour ne pas dessiner quand on clique sur une icone
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     //image.setPixel(mouse.getPosition(window).x, mouse.getPosition(window).y, setColor);  anciennement pour setPixel sur une image
                     Drawings shape;
@@ -419,7 +419,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
 
         }
         if (pinceau.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE) {
+            if (mouse.getPosition(window).y >= POS_LIGNE - SET_ROW) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     if (isDrawing == false) {
                         for (sf::RectangleShape& rectangle : vectorRectangle) {
@@ -456,7 +456,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
             }
         }
         if (gomme.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) {
+            if (mouse.getPosition(window).y >= POS_LIGNE - SET_ROW) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     Drawings shape;
                     shape.setRadius((float)currentSizePinceau);//(float) c'est pour enlever avertissement
