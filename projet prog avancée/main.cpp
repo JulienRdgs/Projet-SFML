@@ -139,7 +139,7 @@ int main() {
     if (!font.loadFromFile("asset/arial.ttf")) { std::cout << "erreur chargement arial" << std::endl; }
 
                         // CREER FENETRE
-    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Paint SFML JRdgs");
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Paint SFML JRdgs", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
 
                         //POUR MODIF L'ICONE DE L'APP
