@@ -1,7 +1,6 @@
-
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
-#include <SFML/System.hpp>
+#include "SFML/Graphics.hpp"
+#include "SFML/Window.hpp"
+#include "SFML/System.hpp" //entre guillemets pour automatiquement include les fichiers sfml
 #include <iostream>
 #include <vector>
 
@@ -420,7 +419,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
 
         }
         if (pinceau.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) {
+            if (mouse.getPosition(window).y >= POS_LIGNE) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     if (isDrawing == false) {
                         for (sf::RectangleShape& rectangle : vectorRectangle) {
