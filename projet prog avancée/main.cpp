@@ -5,7 +5,7 @@
 #include <iostream>
 #include <vector>
 
-//CONST
+                        //CONST
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 const float BUTTON_SIZE = 30.f;
@@ -17,7 +17,7 @@ const float DEFAULT_RECT_SIZE = 125.f;
 const float DEFAULT_CIRCLE_RADIUS = 50.f;
 const float DEFAULT_TRIANGLE_SIZE = 50.f;
 
-//VARIABLES
+                        //VARIABLES
 unsigned int currentSizePinceau = 10;
 bool ecrireActif = false;
 std::string cinUserText;
@@ -26,20 +26,20 @@ sf::Color backgroundChoice = sf::Color::White;
 
 class Drawings; //pour pouvoir déclarer vectorDrawing
 
-//VECTEURS
+                        //VECTEURS
 std::vector<Drawings> vectorDrawing; //les ronds qui servent de dessins
 std::vector<sf::RectangleShape> vectorRectangle; //les rectangles placés par l'utilisateur
 std::vector<sf::CircleShape> vectorRond; //les ronds placés par l'utilisateur
 std::vector<sf::ConvexShape> vectorTriangle; //les triangles placés par l'utilisateur
-//std::vector<allButtons> vectorButtons;
+//std::vector<allButtons> vectorButtons; //plusieurs problèmes avec
 
-                    //CLASSE DES RONDS DESSINES
+                        //CLASSE DES RONDS DESSINES
 class Drawings : public sf::CircleShape {
 public:
     bool gommeState = false; //pour différencier les cercles qui effacent de ceux qui dessinent
 };
 
-                    //CLASSE DES BOUTONS
+                        //CLASSE DES BOUTONS
 class allButtons : public sf::RectangleShape {
 public:
 
@@ -54,47 +54,23 @@ public:
         this->setOutlineColor(sf::Color::Black);
     };
 
-                    //DETECTION D'ACTIVATION DE BOUTON
+                        //DETECTION D'ACTIVATION DE BOUTON
     bool turnOnCheck(allButtons& button, sf::Mouse mouse, sf::RenderWindow& window) {
         if (button.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
             if (button.id.substr(0, 3) != "Mod") { //pour séparer les outils des modificateurs et couleurs
                 button.buttonState = true;
-                system("cls");
-                std::cout << button.id << std::endl; //montrer le choix de bouton dans la console
-                if (button.id == "pinceau") std::cout << "current size : " << currentSizePinceau << std::endl;
-                if (button.id.substr(0, 3) == "Col") { //si le bouton est une couleur, alors la couleur actuelle devient celle-ci
-                    currentColor = button.getFillColor();
-                }
+                if (button.id.substr(0, 3) == "Col") { currentColor = button.getFillColor(); }
             }
             if (button.id == "Mod diminuerTaille") {
-                if (currentSizePinceau <= 4) {
-                    currentSizePinceau = 3;
-                    system("cls");
-                    std::cout << "min size : " << currentSizePinceau << std::endl;
-                }
-                else {
-                    currentSizePinceau -= 3;
-                    system("cls");
-                    std::cout << "size down : " << currentSizePinceau << std::endl;
-                }
+                if (currentSizePinceau <= 4) { currentSizePinceau = 3; }
+                else { currentSizePinceau -= 3; }
             }
             if (button.id == "Mod augmenterTaille") {
-                if (currentSizePinceau >= 37) {
-                    currentSizePinceau = 40;
-                    system("cls");
-                    std::cout << "max size : " << currentSizePinceau << std::endl;
-                }
-                else {
-                    currentSizePinceau += 3;
-                    system("cls");
-                    std::cout << "size up : " << currentSizePinceau << std::endl;
-                }
+                if (currentSizePinceau >= 37) { currentSizePinceau = 40; }
+                else { currentSizePinceau += 3; }
             }
-            if (button.id == "Mod clearAll") {
-                vectorDrawing.clear();
-                system("cls");
-                std::cout << "all cleared" << std::endl;
-            }
+            if (button.id == "Mod clearAll") { vectorDrawing.clear(); }
+
             return true;
         }
         else { return false; }
@@ -133,6 +109,20 @@ bool backgroundCheck(allButtons& bouton) {
 }
 
 int main() {
+                        //MODE D'EMPLOI DANS LA CONSOLE
+    std::cout << "                     MODE D'EMPLOI" << std::endl << std::endl
+        << "Stylo : Dessiner (taille fine)" << std::endl << std::endl
+        << "Pinceau : Dessiner (taille ajustable)" << std::endl << std::endl
+        << "Gomme : Gommer le stylo et le pinceau (taille ajustable)" << std::endl << std::endl
+        << "Souris : Selectionner une forme pour  :" << std::endl
+        << "         l'aggrandir (scroll up)" << std::endl 
+        << "         la retrecir(scroll down)" << std::endl 
+        << "         changer sa couleur"<< std::endl << std::endl
+        << "Seau : Changer la couleur de l'arriere plan" << std::endl << std::endl
+        << "Formes : Placer un rectangle, un rond ou un triangle" << std::endl << std::endl
+        << "Poubelle : Effacer tous les dessins (sans modifier l'arriere plan)" << std::endl << std::endl;
+        
+
                         //IMAGE POUR LE BACKGROUND DU MENU
     sf::Image image;
     image.create((unsigned int)WINDOW_WIDTH, (unsigned int)POS_LIGNE, sf::Color(222, 222, 222)); //(unsigned int) c'est pour éviter les avertissements
@@ -149,7 +139,7 @@ int main() {
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Paint SFML JRdgs");
     window.setFramerateLimit(60);
 
-    //POUR MODIF L'ICONE DE L'APP
+                        //POUR MODIF L'ICONE DE L'APP
 /*sf::Image iconeApp;
 if(!iconeApp.loadFromFile("asset/icone pinceau.png")) { std::cout << "erreur chargement icone appli" << std::endl; }
 window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr());*/
@@ -320,7 +310,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                 window.close();
             }
 
-                        //DETECTION DES CLIQUES SUR ICONES
+                    //DETECTION DES CLIQUES SUR ICONES
             if (event.type == sf::Event::MouseButtonPressed) {
                 if (event.mouseButton.button == sf::Mouse::Left) {
                     if (souris.turnOnCheck(souris, mouse, window)) {
@@ -450,12 +440,10 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                 if (mouse.getPosition(window).y >= POS_LIGNE) { // pour ne pas dessiner sur le menu
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                         sf::RectangleShape shape(sf::Vector2f(DEFAULT_RECT_SIZE, DEFAULT_RECT_SIZE / 2));
-                        shape.setPosition(mouse.getPosition(window).x - DEFAULT_RECT_SIZE/2, mouse.getPosition(window).y - DEFAULT_RECT_SIZE/2);
+                        shape.setPosition(mouse.getPosition(window).x - DEFAULT_RECT_SIZE/2, mouse.getPosition(window).y - DEFAULT_RECT_SIZE/4);
                         shape.setOutlineColor(sf::Color::Black);
                         shape.setOutlineThickness(1);
                         shape.setFillColor(sf::Color::White);
-                        std::cout << shape.getPosition().x << " - " << shape.getPosition().y << std::endl;
-                        std::cout << mouse.getPosition(window).x << " - " << mouse.getPosition(window).y << std::endl;
                         vectorRectangle.push_back(shape);
                         placeRectangle.buttonState = false;
                         placeShape.buttonState = false;
@@ -494,6 +482,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                 }
             }
         }
+                    //CHANGER L'OUTLINE DE LA CASE SELECTIONNEE
         showActiveButton(souris);
         showActiveButton(stylo);
         showActiveButton(pinceau);
@@ -510,7 +499,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
         showActiveButton(rose);
         showActiveButton(blanc);
 
-        //DESSINER
+                    //DESSINER
         window.clear(backgroundChoice);
         for (Drawings& points : vectorDrawing) {
             window.draw(points);
@@ -543,7 +532,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
         window.draw(backgroundColor);
         //for (allButtons &bouton : vectorButtons) {
         //    window.draw(bouton);//tous les boutons 
-        //}//ça fonctionnait mais le fait que les boutons sont dans un vecteur m'empechait de changer leur outLine.
+        //}
 
         if (placeShape.buttonState) {
             window.draw(placeRectangle);
