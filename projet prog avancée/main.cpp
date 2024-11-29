@@ -120,7 +120,9 @@ int main() {
         << "Souris : Bouger des formes" << std::endl << std::endl
         << "Seau : Changer la couleur de l'arriere plan" << std::endl << std::endl
         << "Formes : Placer un rectangle, un rond ou un triangle" << std::endl 
-        << "         (pour supprimer une seule forme, glisser la forme en dehors de l'ecran (pas reellement supprimee)" << std::endl << std::endl
+        << "         (pour supprimer une seule forme, glisser la forme en dehors de l'ecran (pas reellement supprimee)" << std::endl
+        << "         Cliquez sur plusieurs forme pour faire une combinaise" << std::endl
+        << "         NE PAS DRAG UNE FORME SUR UNE AUTRE" << std::endl
         << "Poubelle : Effacer tout (sans modifier l'arriere plan)" << std::endl << std::endl;
         
 
@@ -382,7 +384,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
         }
                         //QUE FAIRE QUAND ICONE ACTIVE                
         if (souris.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { 
+            if (mouse.getPosition(window).y >= POS_LIGNE - SET_ROW) { 
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     for (sf::RectangleShape& rectangle : vectorRectangle) {
                         if (rectangle.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
@@ -486,7 +488,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
         //} pas fini la fonction écrire
         if (placeShape.buttonState) { //nécessaire dans le cas où on a appuyé sur une des 3 formes mais qu'on souhaite utiliser un autre outil
             if (placeRectangle.buttonState) {
-                if (mouse.getPosition(window).y >= POS_LIGNE) { // pour ne pas dessiner sur le menu
+                if (mouse.getPosition(window).y >= POS_LIGNE) {
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                         sf::RectangleShape shape(sf::Vector2f(DEFAULT_RECT_SIZE, DEFAULT_RECT_SIZE / 2));
                         shape.setPosition(mouse.getPosition(window).x - DEFAULT_RECT_SIZE/2, mouse.getPosition(window).y - DEFAULT_RECT_SIZE/4);
@@ -500,7 +502,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                 }
             }
             if (placeRond.buttonState) {
-                if (mouse.getPosition(window).y >= POS_LIGNE) { // pour ne pas dessiner sur le menu
+                if (mouse.getPosition(window).y >= POS_LIGNE) {
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                         sf::CircleShape shape(DEFAULT_CIRCLE_RADIUS);
                         shape.setPosition(mouse.getPosition(window).x - DEFAULT_CIRCLE_RADIUS, mouse.getPosition(window).y - DEFAULT_CIRCLE_RADIUS);
@@ -514,7 +516,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                 }
             }
             if (placeTriangle.buttonState) {
-                if (mouse.getPosition(window).y >= POS_LIGNE) { // pour ne pas dessiner sur le menu
+                if (mouse.getPosition(window).y >= POS_LIGNE) {
                     if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                         sf::ConvexShape shape;
                         shape.setPointCount(3);
