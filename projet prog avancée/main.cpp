@@ -19,8 +19,12 @@ const float DEFAULT_TRIANGLE_SIZE = 50.f;
 
                         //VARIABLES
 unsigned int currentSizePinceau = 10;
-bool ecrireActif = false;
-std::string cinUserText;
+//bool ecrireActif = false;
+bool lock = false;
+sf::Color shapeColor = sf::Color::White;
+int selecShapeCount = 0;
+bool isDrawing = false;
+//std::string cinUserText;
 sf::Color currentColor = sf::Color::Black;
 sf::Color backgroundChoice = sf::Color::White;
 
@@ -69,7 +73,7 @@ public:
                 if (currentSizePinceau >= 37) { currentSizePinceau = 40; }
                 else { currentSizePinceau += 3; }
             }
-            if (button.id == "Mod clearAll") { vectorDrawing.clear(); }
+            if (button.id == "Mod clearAll") { vectorDrawing.clear(); vectorRectangle.clear(); vectorRond.clear(); vectorTriangle.clear(); }
 
             return true;
         }
@@ -112,15 +116,13 @@ int main() {
                         //MODE D'EMPLOI DANS LA CONSOLE
     std::cout << "                     MODE D'EMPLOI" << std::endl << std::endl
         << "Stylo : Dessiner (taille fine)" << std::endl << std::endl
-        << "Pinceau : Dessiner (taille ajustable)" << std::endl << std::endl
+        << "Pinceau : Dessiner (taille ajustable) et changer couleur des formes" << std::endl << std::endl
         << "Gomme : Gommer le stylo et le pinceau (taille ajustable)" << std::endl << std::endl
-        << "Souris : Selectionner une forme pour  :" << std::endl
-        << "         l'aggrandir (scroll up)" << std::endl 
-        << "         la retrecir(scroll down)" << std::endl 
-        << "         changer sa couleur"<< std::endl << std::endl
+        << "Souris : Bouger des formes" << std::endl << std::endl
         << "Seau : Changer la couleur de l'arriere plan" << std::endl << std::endl
-        << "Formes : Placer un rectangle, un rond ou un triangle" << std::endl << std::endl
-        << "Poubelle : Effacer tous les dessins (sans modifier l'arriere plan)" << std::endl << std::endl;
+        << "Formes : Placer un rectangle, un rond ou un triangle" << std::endl 
+        << "         (pour supprimer une seule forme, glisser la forme en dehors de l'ecran (pas reellement supprimee)" << std::endl << std::endl
+        << "Poubelle : Effacer tout (sans modifier l'arriere plan)" << std::endl << std::endl;
         
 
                         //IMAGE POUR LE BACKGROUND DU MENU
@@ -329,10 +331,10 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                         souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; ecrire.buttonState = false; 
                         backgroundColor.buttonState = false; placeShape.buttonState = false;
                     }
-                    if (ecrire.turnOnCheck(ecrire, mouse, window)) {
+                    /*if (ecrire.turnOnCheck(ecrire, mouse, window)) {
                         souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; 
                         backgroundColor.buttonState = false; placeShape.buttonState = false;
-                    }
+                    }*/
                     if (placeShape.turnOnCheck(placeShape, mouse, window)) {
                         souris.buttonState = false; stylo.buttonState = false; pinceau.buttonState = false; gomme.buttonState = false; 
                         backgroundColor.buttonState = false; ecrire.buttonState = false;
@@ -380,8 +382,31 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
             }
         }
                         //QUE FAIRE QUAND ICONE ACTIVE                
+        if (souris.buttonState) {
+            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { 
+                if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                    for (sf::RectangleShape& rectangle : vectorRectangle) {
+                        if (rectangle.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                            rectangle.setPosition(mouse.getPosition(window).x - DEFAULT_RECT_SIZE / 2, mouse.getPosition(window).y - DEFAULT_RECT_SIZE / 4);
+                        }
+                    }
+                    for (sf::CircleShape& rond : vectorRond) {
+                        if (rond.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                            rond.setPosition(mouse.getPosition(window).x - DEFAULT_CIRCLE_RADIUS, mouse.getPosition(window).y - DEFAULT_CIRCLE_RADIUS);
+                        }
+                    }
+                    for (sf::ConvexShape& triangle : vectorTriangle) {
+                        if (triangle.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                            triangle.setPoint(0, sf::Vector2f(mouse.getPosition(window).x, mouse.getPosition(window).y - DEFAULT_TRIANGLE_SIZE));
+                            triangle.setPoint(1, sf::Vector2f(mouse.getPosition(window).x - DEFAULT_TRIANGLE_SIZE, mouse.getPosition(window).y + DEFAULT_TRIANGLE_SIZE));
+                            triangle.setPoint(2, sf::Vector2f(mouse.getPosition(window).x + DEFAULT_TRIANGLE_SIZE, mouse.getPosition(window).y + DEFAULT_TRIANGLE_SIZE));
+                        }
+                    }
+                }
+            }
+        }
         if (stylo.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) {
+            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     //image.setPixel(mouse.getPosition(window).x, mouse.getPosition(window).y, setColor);  anciennement pour setPixel sur une image
                     Drawings shape;
@@ -391,23 +416,48 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                     vectorDrawing.push_back(shape);
                     window.draw(shape);
                 }
-            } // pour ne pas dessiner sur le menu
+            }
 
         }
         if (pinceau.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
+            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
-                    Drawings shape; 
-                    shape.setRadius((float)currentSizePinceau);//(float) c'est pour enlever avertissement
-                    shape.setPosition(mouse.getPosition(window).x - shape.getRadius(), mouse.getPosition(window).y - shape.getRadius());
-                    shape.setFillColor(currentColor);
-                    vectorDrawing.push_back(shape);
-                    window.draw(shape);
+                    if (isDrawing == false) {
+                        for (sf::RectangleShape& rectangle : vectorRectangle) {
+                            if (rectangle.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                                rectangle.setFillColor(currentColor);
+                                selecShapeCount = 1;
+                            }
+                        }
+                        for (sf::CircleShape& rond : vectorRond) {
+                            if (rond.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                                rond.setFillColor(currentColor);
+                                selecShapeCount = 1;
+                            }
+                        }
+                        for (sf::ConvexShape& triangle : vectorTriangle) {
+                            if (triangle.getGlobalBounds().contains(sf::Vector2f(mouse.getPosition(window)))) {
+                                triangle.setFillColor(currentColor);
+                                selecShapeCount = 1;
+                            }
+                        }
+                    }
+                    if (selecShapeCount == 0) {
+                        isDrawing = true;
+                        Drawings shape;
+                        shape.setRadius((float)currentSizePinceau);//(float) c'est pour enlever avertissement
+                        shape.setPosition(mouse.getPosition(window).x - shape.getRadius(), mouse.getPosition(window).y - shape.getRadius());
+                        shape.setFillColor(currentColor);
+                        vectorDrawing.push_back(shape);
+                        window.draw(shape);
+                    }
+                    selecShapeCount = 0;
                 }
+                if (event.type == sf::Event::MouseButtonReleased) isDrawing = false;
             }
         }
         if (gomme.buttonState) {
-            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) { // pour ne pas dessiner sur le menu
+            if (mouse.getPosition(window).y >= POS_LIGNE - currentSizePinceau * 2) {
                 if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                     Drawings shape;
                     shape.setRadius((float)currentSizePinceau);//(float) c'est pour enlever avertissement
@@ -443,7 +493,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                         shape.setPosition(mouse.getPosition(window).x - DEFAULT_RECT_SIZE/2, mouse.getPosition(window).y - DEFAULT_RECT_SIZE/4);
                         shape.setOutlineColor(sf::Color::Black);
                         shape.setOutlineThickness(1);
-                        shape.setFillColor(sf::Color::White);
+                        shape.setFillColor(shapeColor);
                         vectorRectangle.push_back(shape);
                         placeRectangle.buttonState = false;
                         placeShape.buttonState = false;
@@ -457,7 +507,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                         shape.setPosition(mouse.getPosition(window).x - DEFAULT_CIRCLE_RADIUS, mouse.getPosition(window).y - DEFAULT_CIRCLE_RADIUS);
                         shape.setOutlineColor(sf::Color::Black);
                         shape.setOutlineThickness(1);
-                        shape.setFillColor(sf::Color::White);
+                        shape.setFillColor(shapeColor);
                         vectorRond.push_back(shape);
                         placeRond.buttonState = false;
                         placeShape.buttonState = false;
@@ -474,7 +524,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                         shape.setPoint(2, sf::Vector2f(mouse.getPosition(window).x + DEFAULT_TRIANGLE_SIZE, mouse.getPosition(window).y + DEFAULT_TRIANGLE_SIZE));
                         shape.setOutlineColor(sf::Color::Black);
                         shape.setOutlineThickness(1);
-                        shape.setFillColor(sf::Color::White);
+                        shape.setFillColor(shapeColor);
                         vectorTriangle.push_back(shape);
                         placeTriangle.buttonState = false;
                         placeShape.buttonState = false;
@@ -482,14 +532,14 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
                 }
             }
         }
-                    //CHANGER L'OUTLINE DE LA CASE SELECTIONNEE
+                    //CHANGER L'OUTLINE DE LA CASE SELECTIONNEE (pas réussi avec une boucle dans un vecteur)
         showActiveButton(souris);
         showActiveButton(stylo);
         showActiveButton(pinceau);
         showActiveButton(diminuerTaille);
         showActiveButton(augmenterTaille);
         showActiveButton(gomme);
-        showActiveButton(clearAll); //manuellement car pas réussi à modifier l'outLine d'un objet qui se trouve dans un vecteur
+        showActiveButton(clearAll); 
         showActiveButton(ecrire);
         showActiveButton(backgroundColor);
         showActiveButton(noir);
@@ -514,14 +564,14 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
             window.draw(shapes);
         }
         window.draw(spriteImage);//background du menu (pour éviter de dessiner dessus)
-        window.draw(ligne); //la ligne qui sépare les boutons de l'espace de dessin
+        window.draw(ligne); //la ligne qui sépare le menu de l'espace de dessin
 
         window.draw(souris);
         window.draw(stylo);
         window.draw(pinceau);
         window.draw(gomme);
         window.draw(clearAll);
-        window.draw(ecrire);
+        //window.draw(ecrire); pas fini
         window.draw(placeShape);
         window.draw(noir);
         window.draw(rouge);
@@ -539,7 +589,7 @@ window.setIcon(iconeApp.getSize().x, iconeApp.getSize().y, iconeApp.getPixelsPtr
             window.draw(placeRond);
             window.draw(placeTriangle);
         }
-        if (pinceau.buttonState || gomme.buttonState) {//afficher le choix des tailles uniquement quand le pinceau est activé
+        if (pinceau.buttonState || gomme.buttonState) {
             window.draw(diminuerTaille);
             window.draw(augmenterTaille);
             window.draw(displaySize);
